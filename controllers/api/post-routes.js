@@ -91,12 +91,14 @@ router.post('/', (req, res) => {
 
 // PUT /api/posts/upvote
 router.put('/upvote', (req, res) => {
-    return Post.upvote(req.body, { Vote })
-        .then(dbPostData => res.json(dbPostData))
-        .catch(err => {
-            console.log(err);
-            res.status(400).json(err)
-        });
+    if (req.session) {
+        return Post.upvote({ ...req.body, user_id: req.session.user_id }, { Vote, Comment, User })
+            .then(dbPostData => res.json(dbPostData))
+            .catch(err => {
+                console.log(err);
+                res.status(500).json(err)
+            });
+    }
 })
 
 router.put('/:id', (req, res) => {
